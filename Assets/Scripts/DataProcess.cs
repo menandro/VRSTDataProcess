@@ -32,13 +32,28 @@ public class DataProcess : MonoBehaviour {
     string folderout;
     string filename;
 
+    List<string> fileList = new List<string>();
+    public Vector3 trainPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    public Vector3 trainRotation = new Vector3(0.0f, 0.0f, 0.0f);
+
+
     // Use this for initialization
     void Start() {
+        // Populate fileList
+        PopulateFileList();
+        int dataNumber = 6;
+        
+
         //Open files
         transform = this.gameObject.transform;
         folder = "D:/dev/data/VRSTDataVideos";
         folderout = "D:/dev/data/VRSTDataScreenShot";
-        filename = "07232926";
+        filename = fileList[dataNumber];
+
+        SetTrainPose();
+
+        // Train position
+
 
         //Read files
         positionBytes = File.ReadAllBytes(folder + "/" + filename + "position180.dat");
@@ -77,13 +92,16 @@ public class DataProcess : MonoBehaviour {
         copyCamera = copyCameraGameObject.AddComponent<Camera>();
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    private void OnPreRender()
     {
         //Load each frame
         FetchPositionAndRotation();
         transform.position = position;
         transform.rotation = rotation;
+    }
 
+    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    {
         copyCamera.CopyFrom(thisCamera);
         copyCamera.targetTexture = cgDepthTexture;
         RenderTexture.active = cgDepthTexture;
@@ -155,10 +173,60 @@ public class DataProcess : MonoBehaviour {
         return BitConverter.ToSingle(data, 0);
     }
 
+    private void PopulateFileList()
+    {
+        fileList.Add("07110589");
+        fileList.Add("07224247");
+        fileList.Add("07224813");
+        fileList.Add("07225019");
+        fileList.Add("07225152");
+        fileList.Add("07225633");
+        fileList.Add("07225855");
+        fileList.Add("07230222");
+        fileList.Add("07230549");
+        fileList.Add("07230729");
+        fileList.Add("07231338");
+        fileList.Add("07231631");
+        fileList.Add("07231832");
+        fileList.Add("07232017");
+        fileList.Add("07232926");
+    }
+
+
+    private void SetTrainPose()
+    {
+        GameObject train = GameObject.Find("Train");
+        
+        if (filename == "07232926")
+        {
+            train.transform.position = new Vector3(0.071f, -0.297f, 1.171f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -141.40f));
+            train.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        }
+        if ((filename == "07224813")|| (filename == "07225019"))
+        {
+            train.transform.position = new Vector3(0.271f, -0.417f, 1.57f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -100.2f));
+            train.transform.localScale = new Vector3(0.088f, 0.088f, 0.088f);
+        }
+        if (filename == "07225152")
+        {
+            train.transform.position = new Vector3(0.043f, -0.417f, 1.65f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -80.16f));
+            train.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        }
+        if (filename == "07225633")
+        {
+            train.transform.position = new Vector3(0.123f, -0.407f, 0.991f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -90.0f));
+            train.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        }
+
+    }
+    
     // Update is called once per frame
     void Update () {
         QualitySettings.vSyncCount = 0;
-        Application.targetFrameRate = 60;
-
+        Application.targetFrameRate = 20;
     }
 }

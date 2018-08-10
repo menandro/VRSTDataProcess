@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43729943, g: 0.4850691, b: 0.5653406, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -215,10 +215,10 @@ Light:
   m_GameObject: {fileID: 170076733}
   m_Enabled: 1
   serializedVersion: 8
-  m_Type: 1
-  m_Color: {r: 1, g: 0.8535939, b: 0, a: 1}
-  m_Intensity: 5
-  m_Range: 10
+  m_Type: 2
+  m_Color: {r: 0.8745098, g: 0.96366584, b: 1, a: 1}
+  m_Intensity: 3
+  m_Range: 20
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
@@ -250,13 +250,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 170076733}
-  m_LocalRotation: {x: 0.6290497, y: -0.19641042, z: 0.16855332, w: 0.7330138}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.47689992, y: 0.118951485, z: 0.7011375, w: 0.5165494}
+  m_LocalPosition: {x: -0.48, y: 1.378, z: 1.303}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 81.270004, y: -30.000002, z: 0}
+  m_LocalEulerAnglesHint: {x: 160.981, y: -123.13899, z: -62.397003}
 --- !u!1 &221804156
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,9 +356,9 @@ Transform:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 235595939}
-  m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
-  m_LocalPosition: {x: -0.03, y: -0.251, z: 1.044}
-  m_LocalScale: {x: 0.050000068, y: 0.05000008, z: 0.050000064}
+  m_LocalRotation: {x: -0.62724096, y: -0.32644877, z: -0.3264488, w: 0.62724096}
+  m_LocalPosition: {x: 0.375, y: -0.523, z: 1.513}
+  m_LocalScale: {x: 0.0761751, y: 0.076175116, z: 0.07617509}
   m_Children:
   - {fileID: 2032653}
   - {fileID: 1322909758}
@@ -367,7 +367,7 @@ Transform:
   - {fileID: 221804157}
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90.00001, y: 0, z: -54.99}
 --- !u!1 &399289751
 GameObject:
   m_ObjectHideFlags: 0
@@ -534,6 +534,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 731ecd5bd606edf4eb5a8c61781067da, type: 2}
+  trainPosition: {x: 0, y: 0, z: 0}
+  trainRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &618286282
 GameObject:
   m_ObjectHideFlags: 0
