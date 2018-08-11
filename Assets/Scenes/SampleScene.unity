@@ -356,9 +356,9 @@ Transform:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 235595939}
-  m_LocalRotation: {x: -0.62724096, y: -0.32644877, z: -0.3264488, w: 0.62724096}
-  m_LocalPosition: {x: 0.375, y: -0.523, z: 1.513}
-  m_LocalScale: {x: 0.0761751, y: 0.076175116, z: 0.07617509}
+  m_LocalRotation: {x: -0.6272399, y: -0.32645088, z: -0.32645088, w: 0.6272399}
+  m_LocalPosition: {x: 0.35, y: -0.523, z: 1.55}
+  m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_Children:
   - {fileID: 2032653}
   - {fileID: 1322909758}
@@ -533,7 +533,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57b3082c67f69d74b9678028ae74eed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  material: {fileID: 2100000, guid: 731ecd5bd606edf4eb5a8c61781067da, type: 2}
+  alphaBlending: {fileID: 0}
+  transparencyBlending: {fileID: 0}
+  visibilityBlending: {fileID: 2100000, guid: 731ecd5bd606edf4eb5a8c61781067da, type: 2}
+  materialChoice: 0
   trainPosition: {x: 0, y: 0, z: 0}
   trainRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &618286282

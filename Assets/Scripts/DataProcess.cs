@@ -5,7 +5,18 @@ using System.IO;
 using UnityEngine;
 
 public class DataProcess : MonoBehaviour {
-    public Material material;
+    public Material alphaBlending;
+    public Material transparencyBlending;
+    public Material visibilityBlending;
+
+    Material material;
+
+    public enum MaterialChoice
+    {
+        ALPHA, TRANSPARENCY, VISIBILITY
+    }
+
+    public MaterialChoice materialChoice;
 
     byte[] depthBytes;
     byte[] webcamBytes;
@@ -17,7 +28,7 @@ public class DataProcess : MonoBehaviour {
 
     Vector3 position;
     Quaternion rotation;
-    Transform transform;
+    new Transform transform;
 
     Texture2D sceneDepthTexture;
     Texture2D webcamTexture;
@@ -39,9 +50,22 @@ public class DataProcess : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
+        if (materialChoice == MaterialChoice.ALPHA)
+        {
+            material = alphaBlending;
+        }
+        else if (materialChoice == MaterialChoice.TRANSPARENCY)
+        {
+            material = transparencyBlending;
+        }
+        else if (materialChoice == MaterialChoice.VISIBILITY)
+        {
+            material = visibilityBlending;
+        }
+
         // Populate fileList
         PopulateFileList();
-        int dataNumber = 6;
+        int dataNumber = 14; //14, 2, 
         
 
         //Open files
@@ -175,28 +199,69 @@ public class DataProcess : MonoBehaviour {
 
     private void PopulateFileList()
     {
-        fileList.Add("07110589");
-        fileList.Add("07224247");
-        fileList.Add("07224813");
-        fileList.Add("07225019");
-        fileList.Add("07225152");
-        fileList.Add("07225633");
-        fileList.Add("07225855");
-        fileList.Add("07230222");
-        fileList.Add("07230549");
-        fileList.Add("07230729");
-        fileList.Add("07231338");
-        fileList.Add("07231631");
-        fileList.Add("07231832");
-        fileList.Add("07232017");
-        fileList.Add("07232926");
+        fileList.Add("07110859"); //0
+        fileList.Add("07224247"); //1
+        fileList.Add("07224813"); //2
+        fileList.Add("07225019"); //3
+        fileList.Add("07225152"); //4
+        fileList.Add("07225633"); //5
+        fileList.Add("07225855"); //6
+        fileList.Add("07230222"); //7
+        fileList.Add("07230549"); //8
+        fileList.Add("07230729"); //9
+        fileList.Add("07231338"); //10
+        fileList.Add("07231631"); //11
+        fileList.Add("07231832"); //12
+        fileList.Add("07232017"); //13
+        fileList.Add("07232926"); //14
     }
 
 
     private void SetTrainPose()
     {
         GameObject train = GameObject.Find("Train");
-        
+        if (filename == "07231832")
+        {
+            train.transform.position = new Vector3(-2.16f, -0.7f, -2.65f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -229.25f));
+            train.transform.localScale = new Vector3(0.09f, 0.09f, 0.09f);
+        }
+        if (filename == "07231338")
+        {
+            train.transform.position = new Vector3(-0.07f, -0.48f, 1.45f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -214.25f));
+            train.transform.localScale = new Vector3(0.09f, 0.09f, 0.09f);
+        }
+        if (filename == "07230729")
+        {
+            train.transform.position = new Vector3(0.01f, -0.539f, 1.94f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -86.17f));
+            train.transform.localScale = new Vector3(0.09f, 0.09f, 0.09f);
+        }
+        if (filename == "07230549")
+        {
+            train.transform.position = new Vector3(-0.03f, -0.539f, 1.376f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -86.17f));
+            train.transform.localScale = new Vector3(0.078f, 0.078f, 0.078f);
+        }
+        if (filename == "07230222")
+        {
+            train.transform.position = new Vector3(0.15f, -0.523f, 1.6f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -54.99f));
+            train.transform.localScale = new Vector3(0.078f, 0.078f, 0.078f);
+        }
+        if (filename == "07225855x")
+        {
+            train.transform.position = new Vector3(0.35f, -0.523f, 1.55f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -54.99f));
+            train.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
+        }
+        if (filename == "07224247")
+        {
+            train.transform.position = new Vector3(0.11f, -0.523f, 1.73f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -54.99f));
+            train.transform.localScale = new Vector3(0.078f, 0.078f, 0.078f);
+        }
         if (filename == "07232926")
         {
             train.transform.position = new Vector3(0.071f, -0.297f, 1.171f);
@@ -207,13 +272,13 @@ public class DataProcess : MonoBehaviour {
         {
             train.transform.position = new Vector3(0.271f, -0.417f, 1.57f);
             train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -100.2f));
-            train.transform.localScale = new Vector3(0.088f, 0.088f, 0.088f);
+            train.transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
         }
         if (filename == "07225152")
         {
-            train.transform.position = new Vector3(0.043f, -0.417f, 1.65f);
-            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -80.16f));
-            train.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+            train.transform.position = new Vector3(-0.03f, -0.41f, 1.75f);
+            train.transform.rotation = Quaternion.Euler(new Vector3(-90f, 0.0f, -259.26f));
+            train.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
         }
         if (filename == "07225633")
         {

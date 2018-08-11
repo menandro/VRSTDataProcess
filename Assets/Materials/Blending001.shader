@@ -50,6 +50,7 @@
 	};
 
 	float4 frag(vertexOutput input) : COLOR{
+		
 		//Parameters:
 		int windowSize = 5;
 		int maxBin = (2 * windowSize + 1)*(2 * windowSize + 1);
@@ -65,10 +66,28 @@
 		float4 cgDepthC;
 		int binTotal = 0;
 
-		float4 base = _MainTex.Sample(sampler_MainTex, input.tex0);
+		//float4 base = _MainTex.Sample(sampler_MainTex, input.tex0);
 		float4 centerCgDepth = _CgDepthTex.Sample(sampler_CgDepthTex, input.tex0);
 		float centerSceneDepth = _SceneDepthTex.Sample(sampler_SceneDepthTex, input.tex0);
 		float4 webcamCenter = _WebcamTex.Sample(sampler_WebcamTex, input.tex0);
+
+		// Smooth/sharpen the CG to match the scene
+		float sharpenKernel[9] = { 0.0f, -1.0f, 0.0f, -1.0f, 5.0f, -1.0f, 0.0f, -1.0f, 0.0f };
+		float smoothKernel[9] = { 0.1111f, 0.1111f, 0.1111f, 0.1111f, 0.1111f, 0.1111f, 0.1111f, 0.1111f, 0.1111f };
+
+		int smoothWindowSize = 1;
+		int smoothWindowScale = 1;
+		int smoothBin = (2 * smoothWindowSize + 1)*(2 * smoothWindowSize + 1);
+		float4 baseC;
+		float4 base;
+		for (int j = -smoothWindowSize; j <= smoothWindowSize; j++) {
+			for (int i = -smoothWindowSize; i <= smoothWindowSize; i++) {
+				float kernel = smoothKernel[(j + smoothWindowSize)*(2 * smoothWindowSize + 1) + (i + smoothWindowSize)];
+				base += kernel * _MainTex.Sample(sampler_MainTex, input.tex0 +
+					fixed2(_MainTex_TexelSize.x * i * smoothWindowScale, _MainTex_TexelSize.y * j * smoothWindowScale));
+			}
+		}
+		//base = base / (float)smoothBin;
 
 		// Calculate weight
 		if (centerCgDepth.x != 0.0f) {
@@ -134,7 +153,7 @@
 			output = webcamCenter;
 		}
 		else {
-			float vv = 0.7f;
+			float vv = weight;
 			output = vv * webcamCenter + (1.0f - vv) * base;
 		}
 
