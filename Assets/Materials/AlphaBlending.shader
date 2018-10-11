@@ -4,6 +4,8 @@
 	_SceneDepthTex("Scene Depth Texture", 2D) = "white"{}
 	_CgDepthTex("Cg Depth Texture", 2D) = "white"{}
 	_WebcamTex("Webcam Texture", 2D) = "white"{}
+	_ShadowTex("Shadow Texture", 2D) = "white"{}
+	_ShadowDepthTex("Shadow Depth Texture", 2D) = "white" {}
 
 	_VisibilityComplex("Visiblity Complex", Range(0, 1.0)) = 0.1
 		_VisibilitySimple("Visibility Simple", Range(0, 1.0)) = 0.01
@@ -34,6 +36,14 @@
 	uniform SamplerState sampler_WebcamTex;
 	float4 _WebcamTex_TexelSize;
 
+	uniform Texture2D _ShadowTex;
+	uniform SamplerState sampler_ShadowTex;
+	float4 _ShadowTex_TexelSize;
+
+	uniform Texture2D _ShadowDepthTex;
+	uniform SamplerState sampler_ShadowDepthTex;
+	float4 _ShadowDepthTex_TexelSize;
+
 	float _VisibilityComplex;
 	float _VisibilitySimple;
 
@@ -54,11 +64,11 @@
 		//Parameters:
 		int windowSize = 5;
 	int maxBin = (2 * windowSize + 1)*(2 * windowSize + 1);
-	int windowScale = 5; // if Complex, set to high, if Simple, set to low
+	int windowScale = 2; // if Complex, set to high, if Simple, set to low
 	float xm = (float)((2 * windowSize + 1)*(2 * windowSize + 1));
 	float xd = (xm / 2);
-	float pm = 0.2f;
-	float pd = 0.90f;
+	float pm = 0.01f;
+	float pd = 0.9f;
 	float k = (log(pm / (1 - pm)) - log(pd / (1 - pd))) / (xd - xm);
 	float x0 = log(pm / (1 - pm)) / k + xm;
 
@@ -70,6 +80,8 @@
 	float4 centerCgDepth = _CgDepthTex.Sample(sampler_CgDepthTex, input.tex0);
 	float centerSceneDepth = _SceneDepthTex.Sample(sampler_SceneDepthTex, input.tex0);
 	float4 webcamCenter = _WebcamTex.Sample(sampler_WebcamTex, input.tex0);
+	float4 shadow = _ShadowTex.Sample(sampler_ShadowTex, input.tex0);
+	float4 shadowDepth = _ShadowDepthTex.Sample(sampler_ShadowDepthTex, input.tex0);
 
 	// Smooth/sharpen the CG to match the scene
 	float sharpenKernel[9] = { 0.0f, -1.0f, 0.0f, -1.0f, 5.0f, -1.0f, 0.0f, -1.0f, 0.0f };
@@ -132,32 +144,29 @@
 		}
 	}
 
+	_VisibilityComplex = 0.0f;
 	webcamGrayTotal = webcamGrayTotal / (float)maxBinWebcam;
 	float maxValue = 1.0f;
-	float minValue = _VisibilityComplex * webcamGrayTotal;
+	float minValue = 0.0f;
 	float L = maxValue - minValue;
-	float weight = minValue + (L / (1.0f + exp(-k * ((float)binTotal - x0))));
+	float weight = minValue + L * (1.0f - (1.0f / (1.0f + exp(-k * ((float)binTotal - x0)))));
 
 	float4 output;
-	//float4 output = base;
-
-	//output = (1.0f - weight) * output;
-	/*if ((base.x == 0.0f) && (base.y == 0.0f) && (base.z == 0.0f) && (centerCgDepth.x > centerSceneDepth)) {
-	output = webcamCenter;
-	}*/
-
-	if (centerCgDepth.x > centerSceneDepth) {
-		output = base;
+	if ((centerCgDepth.x == 0)) {
+		if (shadowDepth.x > centerSceneDepth) {
+			output = webcamCenter * (1.0f - 0.4f * shadow.w);
+		}
+		else {
+			output = webcamCenter;
+		}
 	}
 	else {
-		output = webcamCenter;
-	}
-	/*else {
 		float vv = weight;
-		output = vv * webcamCenter + (1.0f - vv) * base;
-	}*/
+		output = vv * base + (1.0f - vv) * webcamCenter;
+	}
 
 	return output;
+	
 	}
 		ENDCG
 	}

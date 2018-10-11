@@ -33,6 +33,8 @@ public class DataProcess : MonoBehaviour {
     Texture2D sceneDepthTexture;
     Texture2D webcamTexture;
     RenderTexture cgDepthTexture;
+    RenderTexture shadowTexture;
+    RenderTexture shadowDepthTexture;
 
     private Camera thisCamera;
     private Camera copyCamera;
@@ -47,31 +49,54 @@ public class DataProcess : MonoBehaviour {
     public Vector3 trainPosition = new Vector3(0.0f, 0.0f, 0.0f);
     public Vector3 trainRotation = new Vector3(0.0f, 0.0f, 0.0f);
 
+    Texture2D screenShot;
+    bool takePicture = false;
+    bool takeVideo = false;
+    List<string> blendingType;
+    int blendingTypeIndex;
+    int frameNumberCapture;
 
     // Use this for initialization
     void Start() {
+        int dataNumber = 14; //14, 2,
+        takePicture = false;
+        takeVideo = true;
+        //Set framenumber capture
+        if (dataNumber == 2) frameNumberCapture = 32;
+        else if (dataNumber == 7) frameNumberCapture = 60;
+        else if (dataNumber == 10) frameNumberCapture = 13;
+        else if (dataNumber == 4) frameNumberCapture = 61;
+        else if (dataNumber == 5) frameNumberCapture = 5;
+        else frameNumberCapture = 80;
+
+        blendingType = new List<string>();
+        blendingType.Add("alpha");
+        blendingType.Add("transparency");
+        blendingType.Add("visibility");
+
         if (materialChoice == MaterialChoice.ALPHA)
         {
             material = alphaBlending;
+            blendingTypeIndex = 0;
         }
         else if (materialChoice == MaterialChoice.TRANSPARENCY)
         {
             material = transparencyBlending;
+            blendingTypeIndex = 1;
         }
         else if (materialChoice == MaterialChoice.VISIBILITY)
         {
             material = visibilityBlending;
+            blendingTypeIndex = 2;
         }
 
         // Populate fileList
         PopulateFileList();
-        int dataNumber = 14; //14, 2, 
         
-
         //Open files
         transform = this.gameObject.transform;
         folder = "D:/dev/data/VRSTDataVideos";
-        folderout = "D:/dev/data/VRSTDataScreenShot";
+        folderout = "D:/dev/data/VRSTResultsForVideo";
         filename = fileList[dataNumber];
 
         SetTrainPose();
@@ -106,14 +131,20 @@ public class DataProcess : MonoBehaviour {
         sceneDepthTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.R8, false);
         webcamTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
         cgDepthTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.Depth);
+        shadowTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.ARGB32);
+        shadowDepthTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.Depth);
 
         material.SetTexture("_SceneDepthTex", sceneDepthTexture);
         material.SetTexture("_CgDepthTex", cgDepthTexture);
         material.SetTexture("_WebcamTex", webcamTexture);
+        material.SetTexture("_ShadowTex", shadowTexture);
+        material.SetTexture("_ShadowDepthTex", shadowDepthTexture);
 
         thisCamera = this.gameObject.GetComponent<Camera>();
         copyCameraGameObject = new GameObject("Depth Renderer Camera");
         copyCamera = copyCameraGameObject.AddComponent<Camera>();
+
+        screenShot = new Texture2D(Screen.width, Screen.height, TextureFormat.RGBA32, false);
     }
 
     private void OnPreRender()
@@ -131,10 +162,42 @@ public class DataProcess : MonoBehaviour {
         RenderTexture.active = cgDepthTexture;
         copyCamera.Render();
 
+        copyCamera.targetTexture = shadowDepthTexture;
+        RenderTexture.active = shadowDepthTexture;
+        copyCamera.cullingMask = 1 << 11;
+        copyCamera.Render();
+
+        copyCamera.targetTexture = shadowTexture;
+        RenderTexture.active = shadowTexture;
+        copyCamera.cullingMask = 1 << 10;
+        copyCamera.Render();
+
         FetchDepth();
         FetchWebcam();
         frame++;
         Graphics.Blit(source, destination, material);
+        //Debug.Log(frame.ToString());
+
+        // Save one image
+        //if (frame == frameNumberCapture)
+        //{
+        //    if (takePicture)
+        //    {
+        //        screenShot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        //        byte[] data = screenShot.EncodeToPNG();
+        //        File.WriteAllBytes(folderout + "/" + filename + "output" + blendingType[blendingTypeIndex] + frame + ".png", data);
+        //    }
+        //}
+
+        // Save all images
+        if ((takeVideo) && (frame < 180))
+        {
+            screenShot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+            byte[] data = screenShot.EncodeToPNG();
+            File.WriteAllBytes(folderout + "/" + blendingType[blendingTypeIndex] +  "/" + filename + "output" + blendingType[blendingTypeIndex] + frame + ".png", data);
+        }
+
+
     }
 
     private void FetchPositionAndRotation()
@@ -169,11 +232,18 @@ public class DataProcess : MonoBehaviour {
         depthMs.Read(depthData, 0, Screen.width * Screen.height);
         sceneDepthTexture.LoadRawTextureData(depthData);
         sceneDepthTexture.Apply();
-        if (frame == 80)
+        if (frame == frameNumberCapture)
+        {
+            if (takePicture)
+            {
+                byte[] data = sceneDepthTexture.EncodeToPNG();
+                System.IO.File.WriteAllBytes(folderout + "/" + filename + "scenedepth.png", data);
+            }
+        }
+        if (takeVideo && (frame < 180))
         {
             byte[] data = sceneDepthTexture.EncodeToPNG();
-            System.IO.File.WriteAllBytes(folderout + "/" + filename + "scenedepth.png", data);
-
+            System.IO.File.WriteAllBytes(folderout + "/scenedepth/" + filename + "scenedepth" + frame + ".png", data);
         }
     }
 
@@ -184,12 +254,23 @@ public class DataProcess : MonoBehaviour {
         webcamTexture.LoadRawTextureData(rgbData);
         webcamTexture.Apply();
         
-        if (frame == 80)
+        if (frame == frameNumberCapture)
+        {
+            if (takePicture)
+            {
+                byte[] data = webcamTexture.EncodeToPNG();
+                System.IO.File.WriteAllBytes(folderout + "/" + filename + "webcam.png", data);
+            }
+
+            
+        }
+
+        if (takeVideo && (frame < 180))
         {
             byte[] data = webcamTexture.EncodeToPNG();
-            System.IO.File.WriteAllBytes(folderout + "/" + filename + "webcam.png", data);
+            System.IO.File.WriteAllBytes(folderout + "/input/" + filename + "input" + frame + ".png", data);
         }
-        
+
     }
 
     private float ConvertToFloat(byte[] data)
