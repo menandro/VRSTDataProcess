@@ -987,7 +987,7 @@ MonoBehaviour:
   transparencyBlending: {fileID: 2100000, guid: ff011d9a4306703469bb2fda3ffe750d,
     type: 2}
   visibilityBlending: {fileID: 2100000, guid: 20f92fd86f370e54cbff8673d22bd7ac, type: 2}
-  materialChoice: 1
+  materialChoice: 2
   trainPosition: {x: 0, y: 0, z: 0}
   trainRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &618286282
